@@ -10,5 +10,5 @@ dbConnect().catch((err) => {
   console.log("conect to database err : ", err);
 });
 app.listen(PORT, () => {
-  console.log(`localhost:${PORT}`);
+  console.log(`http://localhost:${PORT}`);
 });
