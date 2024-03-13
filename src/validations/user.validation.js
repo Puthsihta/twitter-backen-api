@@ -41,7 +41,31 @@ const creatUserValidation = checkSchema({
     notEmpty: true,
   },
   password: {
-    notEmpty: true,
+    isLength: {
+      options: {
+        max: 30,
+        min: 6,
+      },
+      errorMessage:
+        "Password length must be 20 characters maximum and 3 characters minimum.",
+    },
+  },
+  confirmedPassword: {
+    isLength: {
+      options: {
+        max: 30,
+        min: 6,
+      },
+      errorMessage:
+        "Password length must be 20 characters maximum and 3 characters minimum.",
+    },
+    custom: {
+      options: async (value, { req }) => {
+        if (value != req.body.password) {
+          throw new Error("Password mismatched!");
+        }
+      },
+    },
   },
 });
 
@@ -84,4 +108,35 @@ const updateUserValidation = checkSchema({
   },
 });
 
-module.exports = { creatUserValidation, updateUserValidation };
+const loginUserValidator = checkSchema({
+  email: {
+    isEmail: true,
+    errorMessage: "Invalid email address",
+    custom: {
+      options: async (value) => {
+        const user = await userModel.find({
+          email: value,
+        });
+        if (user.length == 0) {
+          throw new Error("Email not registered");
+        }
+      },
+    },
+  },
+  password: {
+    isLength: {
+      options: {
+        max: 30,
+        min: 6,
+      },
+      errorMessage:
+        "Password length must be 20 characters maximum and 3 characters minimum.",
+    },
+  },
+});
+
+module.exports = {
+  creatUserValidation,
+  updateUserValidation,
+  loginUserValidator,
+};
