@@ -66,7 +66,11 @@ const loginUser = asyncHandler(async (req, res) => {
       email: user.email,
       username: user.username,
     },
-    SECRET
+    SECRET,
+    {
+      issuer: "api.tfdevs.com",
+      audience: "wwww.tfdevs.com",
+    }
   );
   return res.status(200).json({ token });
 });
