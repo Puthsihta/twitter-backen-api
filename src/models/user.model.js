@@ -4,7 +4,9 @@ const { Schema } = mongoose;
 const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
   username: { type: String, required: true, unique: true },
-  dateOfBirth: { type: Date, require: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  dateOfBirth: { type: Date, require: false },
   password: { type: String, required: true },
   followers: [{ type: mongoose.Types.ObjectId, ref: "users" }],
   followings: [{ type: mongoose.Types.ObjectId, ref: "users" }],

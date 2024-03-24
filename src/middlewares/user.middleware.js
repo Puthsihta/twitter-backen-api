@@ -5,7 +5,7 @@ const userMiddleWare = async (req, res, next) => {
   if (result.isEmpty()) {
     next();
   } else {
-    res.send({ errors: result.array() });
+    res.send({ message: false, errors: result.array()[0] });
   }
 };
 

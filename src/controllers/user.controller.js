@@ -13,16 +13,30 @@ const getUserById = async (req, res) => {
   res.json({ message: true, data: { data: user } });
 };
 const createUser = asyncHandler(async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, lastName, firstName } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
   const newUser = new userModel({
     username: username,
     email: email,
+    firstName: firstName,
+    lastName: lastName,
     password: hashedPassword,
   });
   const result = await newUser.save();
   result.password = "";
-  res.json({ message: true, data: { data: result } });
+  const token = jwt.sign(
+    {
+      id: result._id,
+      email: result.email,
+      username: result.username,
+    },
+    SECRET,
+    {
+      issuer: "api.tfdevs.com",
+      audience: "wwww.tfdevs.com",
+    }
+  );
+  res.json({ message: true, token, data: result });
 });
 const deleteUserById = async (req, res) => {
   const result = await userModel.deleteOne({ _id: req.params.id });
@@ -54,12 +68,6 @@ const loginUser = asyncHandler(async (req, res) => {
   const user = await userModel.findOne({
     email: email,
   });
-  //Compare password
-  const passwordMatch = await bcrypt.compare(password, user.password);
-  if (!passwordMatch) {
-    return res.status(401).json({ error: "Password or email incorrect!" });
-  }
-  //Return JWT to client
   const token = jwt.sign(
     {
       id: user._id,
@@ -72,7 +80,7 @@ const loginUser = asyncHandler(async (req, res) => {
       audience: "wwww.tfdevs.com",
     }
   );
-  return res.status(200).json({ token });
+  return res.status(200).json({ message: true, token, data: user });
 });
 
 module.exports = {

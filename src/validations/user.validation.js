@@ -1,5 +1,6 @@
 const { checkSchema } = require("express-validator");
 const { userModel } = require("../models/user.model");
+const bcrypt = require("bcrypt");
 
 const creatUserValidation = checkSchema({
   username: {
@@ -37,8 +38,13 @@ const creatUserValidation = checkSchema({
       },
     },
   },
-  dateOfBirth: {
+  firstName: {
     notEmpty: true,
+    errorMessage: "First name is required",
+  },
+  lastName: {
+    notEmpty: true,
+    errorMessage: "Last name is required",
   },
   password: {
     isLength: {
@@ -131,6 +137,17 @@ const loginUserValidator = checkSchema({
       },
       errorMessage:
         "Password length must be 20 characters maximum and 3 characters minimum.",
+    },
+    custom: {
+      options: async (value, { req }) => {
+        const user = await userModel.findOne({
+          email: req.body.email,
+        });
+        const passwordMatch = await bcrypt.compare(value, user.password);
+        if (!passwordMatch) {
+          throw new Error("Incorrect password!");
+        }
+      },
     },
   },
 });
